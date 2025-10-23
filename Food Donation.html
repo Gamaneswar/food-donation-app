@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Food Donate</title>
+  <style>
+    body { 
+      background-image: url('larm-rmah-AEaTUnvneik-unsplash.jpg.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-attachment: fixed;
+      font-family: 'Poppins', Arial, sans-serif;
+      margin: 0; 
+    }
+    .container {
+      max-width: 430px;
+      margin: 40px auto;
+      padding: 32px 26px 26px 26px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(50, 120, 100, 0.12);
+    }
+    .logo-text { 
+      font-size: 35px; 
+      color: #12804a; 
+      font-weight: bold; 
+      margin-bottom: 9px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      font-size: 33px;
+      color: #12804a;
+    }
+    .subtitle, .desc, .message, .user-id, .role-tag, .change-role {
+      margin-bottom: 16px;
+      color: #666;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .user-id { color: #179c50; font-weight: 700; }
+    .role-tag {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      margin: 7px 7px 0 0;
+    }
+    .restaurant-role { background: #1db665; color: #fff; }
+    .shelter-role { background: #2677c3; color: #fff; }
+    .change-role { color: #d22727; margin-left: 5px; cursor: pointer; font-weight: bold; }
+    h2 { margin-bottom: 13px; color: #17508d; font-size: 23px; }
+    .button-group { display: flex; flex-direction: column; gap: 17px; margin-bottom: 5px; }
+    .btn {
+      font-size: 19px; font-weight: bold;
+      padding: 16px 0; border-radius: 9px;
+      border: none; cursor: pointer; width: 100%; transition: all .22s;
+      margin-top: 0;
+    }
+    .btn-green { background: #1db665; color: #fff; }
+    .btn-green:hover { background: #14844a; }
+    .btn-blue { background: #2b74cb; color: #fff; }
+    .btn-blue:hover { background: #17508d; }
+    .form-group { margin-bottom: 19px; }
+    label { display: block; margin-bottom: 7px; font-weight: 600; color: #555; }
+    input, textarea, select {
+      width: 100%; padding: 10px 8px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;
+    }
+    textarea { resize: vertical; }
+    .info-box {
+      background: #eaf4ff; border-left: 5px solid #2677c3; border-radius: 10px; padding: 14px 12px; margin: 16px 0;
+      color: #17508d; font-size: 15px;
+    }
+    .message { font-size: 17px; color: green; margin-top: 10px; }
+    .posted-donations { margin-top: 24px; }
+    .donation-entry {
+      background: #f0fbf6;
+      border: 1px solid #d3efe2;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      padding: 13px;
+      font-size: 15px;
+      color: #134023;
+      text-align: left;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+<body>
+<div class="container" id="app">
+  <!-- Login Page -->
+  <div id="loginView">
+    <div class="logo-text">
+      <span class="material-symbols-outlined logo-icon">restaurant</span>
+      Food Connect
+    </div>
+    <div class="subtitle">Login to access food donation network</div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required />
+      </div>
+      <button type="submit" class="btn btn-green">Login</button>
+      <div class="message" id="loginMsg"></div>
+    </form>
+  </div>
+  <!-- Authenticated Role Select -->
+  <div id="roleView" style="display:none;">
+    <div class="logo-text">
+      <span class="material-symbols-outlined logo-icon">restaurant</span>
+      Food Connect
+    </div>
+    <div class="subtitle">Authenticated successfully.</div>
+    <div class="desc">User ID: <span class="user-id" id="userid"></span></div>
+    <h2>Select Your Role</h2>
+    <div class="button-group">
+      <button class="btn btn-green" onclick="setRole('restaurant')">I am a Restaurant (Donor)</button>
+      <button class="btn btn-blue" onclick="setRole('shelter')">I am a Shelter (Receiver)</button>
+    </div>
+    <div style="color:#888; font-size:15px; margin-top:12px;">
+      Your role determines the actions you can take in the network.
+    </div>
+  </div>
+  <!-- Main App -->
+  <div id="mainView" style="display:none;">
+    <div class="logo-text">
+      <span class="material-symbols-outlined logo-icon">restaurant</span>
+      Food Connect
+    </div>
+    <div class="subtitle">Authenticated successfully.</div>
+    <div class="desc">
+      User ID: <span class="user-id" id="showUserid"></span>
+      <span id="roleTags"></span>
+    </div>
+    <div class="change-role" onclick="resetRole()">Change</div>
+    <div id="contentArea"></div>
+  </div>
+</div>
+<script>
+  // State management
+  let userId = "";
+  let userRole = "";
+  let postedDonations = [];
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const uname = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    if (uname && pass) {
+      userId = Math.floor(Math.random()*1e18).toString();
+      document.getElementById('userid').textContent = userId;
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('roleView').style.display = '';
+      document.getElementById('loginMsg').textContent = '';
+    } else {
+      document.getElementById('loginMsg').textContent = "Please enter username and password.";
+    }
+  });
+
+  function setRole(role) {
+    userRole = role;
+    document.getElementById('roleView').style.display = 'none';
+    document.getElementById('mainView').style.display = '';
+    document.getElementById('showUserid').textContent = userId;
+    updateRoleTags();
+    renderMainArea();
+  }
+  function resetRole() {
+    userRole = "";
+    document.getElementById('mainView').style.display = 'none';
+    document.getElementById('roleView').style.display = '';
+    document.getElementById('roleTags').innerHTML = "";
+  }
+  function updateRoleTags() {
+    let tags = '';
+    if (userRole === "restaurant") {
+      tags = `<span class="role-tag restaurant-role">Restaurant</span>`;
+    } else if (userRole === "shelter") {
+      tags = `<span class="role-tag shelter-role">Shelter</span>`;
+    }
+    document.getElementById('roleTags').innerHTML = tags;
+  }
+  function renderRestaurantArea() {
+    document.getElementById('contentArea').innerHTML = `
+      <h2>Post a Donation</h2>
+      <form id="donationForm">
+        <div class="form-group">
+          <label for="foodType">Food Type</label>
+          <input type="text" id="foodType" placeholder="E.g. Pizza, Bread, Vegetables..." required>
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantity / Estimate</label>
+          <input type="text" id="quantity" placeholder="E.g. 50 lbs, 20 servings, 3 boxes" required>
+        </div>
+        <div class="form-group">
+          <label for="pickupDate">Best By / Pickup Date</label>
+          <input type="date" id="pickupDate" required>
+        </div>
+        <button type="submit" class="btn btn-green">Post Donation</button>
+        <div class="message" id="donationMsg"></div>
+      </form>
+      <div class="posted-donations">
+        <h2 style="color:#179c50;">My Posted Donations</h2>
+        <div id="postedList"></div>
+      </div>
+    `;
+    document.getElementById('donationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const foodType = document.getElementById('foodType').value.trim();
+      const quantity = document.getElementById('quantity').value.trim();
+      const pickupDate = document.getElementById('pickupDate').value;
+      if (foodType && quantity && pickupDate) {
+        postedDonations.push({foodType, quantity, pickupDate, donorId: userId});
+        document.getElementById('donationMsg').style.color = "green";
+        document.getElementById('donationMsg').textContent = "Donation posted successfully!";
+        renderPostedList();
+        document.getElementById('donationForm').reset();
+      } else {
+        document.getElementById('donationMsg').style.color = "red";
+        document.getElementById('donationMsg').textContent = "All fields are required.";
+      }
+    });
+    renderPostedList();
+  }
+  function renderPostedList() {
+    const listDiv = document.getElementById('postedList');
+    if (!postedDonations.length) {
+      listDiv.innerHTML = "<div>No donations posted yet.</div>";
+      return;
+    }
+    let html = "";
+    postedDonations.forEach((donation, i) => {
+      html += `
+      <div class="donation-entry">
+        <b>${donation.foodType}</b> <br>
+        Quantity: ${donation.quantity} <br>
+        Pickup Date: ${donation.pickupDate} <br>
+        ID: ${donation.donorId}
+      </div>`;
+    });
+    listDiv.innerHTML = html;
+  }
+  function renderShelterArea() {
+    document.getElementById('contentArea').innerHTML = `
+      <h2>Welcome, Shelter</h2>
+      <div style="margin-bottom:18px;">
+        Browse the posted donations and click "Claim Donation" when you can pick up food.
+      </div>
+      <div class="info-box">
+        <b>Claiming Rules:</b>
+        <ul>
+          <li>Only one shelter can claim a donation at a time.</li>
+          <li>Contact the donor (via their ID) after claiming for pickup arrangements.</li>
+          <li>Donations not claimed are <b>Available</b>.</li>
+        </ul>
+      </div>
+      <div class="posted-donations">
+        <h2 style="color:#2677c3;">Available Donations</h2>
+        <div id="availableList"></div>
+      </div>
+    `;
+    renderAvailableList();
+  }
+  function renderAvailableList() {
+    const listDiv = document.getElementById('availableList');
+    if (!postedDonations.length) {
+      listDiv.innerHTML = "<div>No donations available yet.</div>";
+      return;
+    }
+    let html = "";
+    postedDonations.forEach((donation, idx) => {
+      html += `
+      <div class="donation-entry">
+        <b>${donation.foodType}</b> <br>
+        Quantity: ${donation.quantity} <br>
+        Pickup Date: ${donation.pickupDate} <br>
+        Donor ID: ${donation.donorId} <br>
+        <button class="btn btn-blue" onclick="claimDonation(${idx})">Claim Donation</button>
+      </div>`;
+    });
+    listDiv.innerHTML = html;
+  }
+  function claimDonation(idx) {
+    alert("Donation claimed! Contact Donor ID: " + postedDonations[idx].donorId);
+    postedDonations.splice(idx,1);
+    renderAvailableList();
+  }
+  function renderMainArea() {
+    if (userRole === "restaurant") renderRestaurantArea();
+    if (userRole === "shelter") renderShelterArea();
+  }
+</script>
+</body>
+</html>
