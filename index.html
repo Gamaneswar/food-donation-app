@@ -1,301 +1,398 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Food Donate</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Food Donate 🍕 </title>
   <style>
-    body { 
+    /* Basic page */
+    :root { --card-w:430px; --card-h:480px; }
+    body{
+      margin:0;
+      font-family: 'Poppins', Arial, sans-serif;
       background-image: url('larm-rmah-AEaTUnvneik-unsplash.jpg.jpg');
       background-size: cover;
-      background-position: center center;
-      background-attachment: fixed;
-      font-family: 'Poppins', Arial, sans-serif;
-      margin: 0; 
+      background-position: center;
+      perspective:1200px;
+      overflow-x:hidden;
     }
-    .container {
-      max-width: 430px;
-      margin: 40px auto;
-      padding: 32px 26px 26px 26px;
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 8px 32px rgba(50, 120, 100, 0.12);
+
+    /* Floating emoji background */
+    .emoji-bg{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .emoji-bg span{ position:absolute; font-size:40px; opacity:0.45; animation:spin3D 12s linear infinite; }
+    @keyframes spin3D{
+      0%{ transform:rotateY(0deg) rotateX(0deg) translateZ(0); }
+      50%{ transform:rotateY(180deg) rotateX(20deg) translateZ(60px); }
+      100%{ transform:rotateY(360deg) rotateX(0deg) translateZ(0); }
     }
-    .logo-text { 
-      font-size: 35px; 
-      color: #12804a; 
-      font-weight: bold; 
-      margin-bottom: 9px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+
+    /* flip area */
+    .flip-container{ width:var(--card-w); height:var(--card-h); margin:48px auto; position:relative; z-index:5; transition:transform .15s;}
+    .flipper{ width:100%; height:100%; transform-style:preserve-3d; transition:transform 0.9s cubic-bezier(.2,.9,.2,1); position:relative;}
+    .flipped{ transform:rotateY(180deg); }
+
+    .card{
+      position:absolute; inset:0; backface-visibility:hidden; border-radius:18px;
+      background:#ffffffdd; padding:28px; box-sizing:border-box;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.18); transform-style:preserve-3d;
+      display:flex; flex-direction:column; justify-content:flex-start;
     }
-    .logo-icon {
-      font-size: 33px;
-      color: #12804a;
-    }
-    .subtitle, .desc, .message, .user-id, .role-tag, .change-role {
-      margin-bottom: 16px;
-      color: #666;
-      font-size: 16px;
-      font-weight: 500;
-    }
-    .user-id { color: #179c50; font-weight: 700; }
-    .role-tag {
-      display: inline-block;
-      padding: 5px 14px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: bold;
-      margin: 7px 7px 0 0;
-    }
-    .restaurant-role { background: #1db665; color: #fff; }
-    .shelter-role { background: #2677c3; color: #fff; }
-    .change-role { color: #d22727; margin-left: 5px; cursor: pointer; font-weight: bold; }
-    h2 { margin-bottom: 13px; color: #17508d; font-size: 23px; }
-    .button-group { display: flex; flex-direction: column; gap: 17px; margin-bottom: 5px; }
-    .btn {
-      font-size: 19px; font-weight: bold;
-      padding: 16px 0; border-radius: 9px;
-      border: none; cursor: pointer; width: 100%; transition: all .22s;
-      margin-top: 0;
-    }
-    .btn-green { background: #1db665; color: #fff; }
-    .btn-green:hover { background: #14844a; }
-    .btn-blue { background: #2b74cb; color: #fff; }
-    .btn-blue:hover { background: #17508d; }
-    .form-group { margin-bottom: 19px; }
-    label { display: block; margin-bottom: 7px; font-weight: 600; color: #555; }
-    input, textarea, select {
-      width: 100%; padding: 10px 8px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box;
-    }
-    textarea { resize: vertical; }
-    .info-box {
-      background: #eaf4ff; border-left: 5px solid #2677c3; border-radius: 10px; padding: 14px 12px; margin: 16px 0;
-      color: #17508d; font-size: 15px;
-    }
-    .message { font-size: 17px; color: green; margin-top: 10px; }
-    .posted-donations { margin-top: 24px; }
-    .donation-entry {
-      background: #f0fbf6;
-      border: 1px solid #d3efe2;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      padding: 13px;
-      font-size: 15px;
-      color: #134023;
-      text-align: left;
+    .card.back{ transform:rotateY(180deg); }
+
+    .logo-text{ display:flex; gap:12px; align-items:center; font-weight:700; font-size:28px; color:#12804a; transform:translateZ(30px); }
+    .logo-icon{ font-size:34px; color:#12804a; }
+    h2{ color:#17508d; margin:8px 0 12px 0; transform:translateZ(20px); }
+
+    .form-group{ margin-bottom:14px; }
+    label{ display:block; margin-bottom:6px; font-weight:600; color:#444; transform:translateZ(15px);}
+    input{ width:100%; padding:10px 10px; border-radius:8px; border:1px solid #cfcfcf; font-size:15px; background:#fff9; transition:box-shadow .15s, transform .15s; }
+    input:focus{ outline:none; box-shadow:0 6px 18px rgba(23,156,80,0.14); transform:translateZ(8px); border-color:#179c50; }
+
+    .btn{ width:100%; padding:12px 14px; border-radius:10px; font-weight:700; font-size:16px; cursor:pointer; border:none; margin-top:8px; box-shadow:0 6px 0 rgba(0,0,0,0.12); transform:translateZ(20px); transition:transform .18s, box-shadow .18s; }
+    .btn:active{ transform:translateZ(14px) translateY(2px); box-shadow:0 3px 0 rgba(0,0,0,0.15); }
+    .btn-green{ background:#1db665; color:white; }
+    .btn-blue{ background:#2b74cb; color:white; }
+
+    .link{ text-align:center; margin-top:12px; color:#17508d; cursor:pointer; font-weight:600; text-decoration:underline; }
+
+    /* small messages */
+    .message{ margin-top:8px; color:#c33; font-weight:600; min-height:20px; }
+
+    /* Role view container (shown after auth) */
+    .role-container{ width:var(--card-w); margin:18px auto; padding:18px; border-radius:12px; background:#ffffffcc; box-shadow:0 8px 28px rgba(0,0,0,0.12); z-index:6; text-align:center; display:none; }
+    .role-container .btn{ width:90%; margin:8px auto; display:block; }
+
+    /* Main app area */
+    .app-main{ width:var(--card-w); margin:18px auto 80px; padding:20px; border-radius:12px; background:#ffffffdd; box-shadow:0 8px 28px rgba(0,0,0,0.12); display:none; z-index:6; }
+    .top-row{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; }
+    .role-tag{ padding:6px 10px; border-radius:8px; color:white; font-weight:700; }
+    .restaurant-role{ background:#1db665; } .shelter-role{ background:#2677c3; }
+    .change-role{ cursor:pointer; color:#d22727; font-weight:700; text-decoration:underline; }
+
+    .donation-entry{ background:#f7fffb; border:1px solid #dfefe4; padding:10px; border-radius:8px; margin-bottom:10px; }
+    .posted-list{ max-height:220px; overflow:auto; margin-top:10px; }
+
+    /* cursor floating foods */
+    .food{ position:fixed; pointer-events:none; font-size:30px; animation:float3D 2s ease-out forwards; z-index:4; transform:translateZ(200px); }
+    @keyframes float3D{ 0%{opacity:1; transform:translate3d(0,0,0) scale(1);} 50%{ transform:translate3d(20px,-40px,60px) scale(1.25);} 100%{opacity:0; transform:translate3d(-20px,-100px,-100px) scale(0.5);} }
+
+    /* responsive */
+    @media (max-width:480px){
+      :root{ --card-w:92vw; --card-h:520px; }
+      .flip-container{ margin:30px auto; }
     }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 <body>
-<div class="container" id="app">
-  <!-- Login Page -->
-  <div id="loginView">
-    <div class="logo-text">
-      <span class="material-symbols-outlined logo-icon">restaurant</span>
-      Food Connect
-    </div>
-    <div class="subtitle">Login to access food donation network</div>
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" required />
-      </div>
-      <button type="submit" class="btn btn-green">Login</button>
-      <div class="message" id="loginMsg"></div>
-    </form>
-  </div>
-  <!-- Authenticated Role Select -->
-  <div id="roleView" style="display:none;">
-    <div class="logo-text">
-      <span class="material-symbols-outlined logo-icon">restaurant</span>
-      Food Connect
-    </div>
-    <div class="subtitle">Authenticated successfully.</div>
-    <div class="desc">User ID: <span class="user-id" id="userid"></span></div>
-    <h2>Select Your Role</h2>
-    <div class="button-group">
-      <button class="btn btn-green" onclick="setRole('restaurant')">I am a Restaurant (Donor)</button>
-      <button class="btn btn-blue" onclick="setRole('shelter')">I am a Shelter (Receiver)</button>
-    </div>
-    <div style="color:#888; font-size:15px; margin-top:12px;">
-      Your role determines the actions you can take in the network.
-    </div>
-  </div>
-  <!-- Main App -->
-  <div id="mainView" style="display:none;">
-    <div class="logo-text">
-      <span class="material-symbols-outlined logo-icon">restaurant</span>
-      Food Connect
-    </div>
-    <div class="subtitle">Authenticated successfully.</div>
-    <div class="desc">
-      User ID: <span class="user-id" id="showUserid"></span>
-      <span id="roleTags"></span>
-    </div>
-    <div class="change-role" onclick="resetRole()">Change</div>
-    <div id="contentArea"></div>
-  </div>
-</div>
-<script>
-  // State management
-  let userId = "";
-  let userRole = "";
-  let postedDonations = [];
+  <!-- emoji background -->
+  <div class="emoji-bg" id="emoji-bg"></div>
 
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const uname = document.getElementById('username').value.trim();
-    const pass = document.getElementById('password').value.trim();
-    if (uname && pass) {
-      userId = Math.floor(Math.random()*1e18).toString();
-      document.getElementById('userid').textContent = userId;
-      document.getElementById('loginView').style.display = 'none';
-      document.getElementById('roleView').style.display = '';
-      document.getElementById('loginMsg').textContent = '';
-    } else {
-      document.getElementById('loginMsg').textContent = "Please enter username and password.";
-    }
-  });
+  <!-- Flip auth card -->
+  <div class="flip-container" id="flipContainer">
+    <div class="flipper" id="flipper">
 
-  function setRole(role) {
-    userRole = role;
-    document.getElementById('roleView').style.display = 'none';
-    document.getElementById('mainView').style.display = '';
-    document.getElementById('showUserid').textContent = userId;
-    updateRoleTags();
-    renderMainArea();
-  }
-  function resetRole() {
-    userRole = "";
-    document.getElementById('mainView').style.display = 'none';
-    document.getElementById('roleView').style.display = '';
-    document.getElementById('roleTags').innerHTML = "";
-  }
-  function updateRoleTags() {
-    let tags = '';
-    if (userRole === "restaurant") {
-      tags = `<span class="role-tag restaurant-role">Restaurant</span>`;
-    } else if (userRole === "shelter") {
-      tags = `<span class="role-tag shelter-role">Shelter</span>`;
-    }
-    document.getElementById('roleTags').innerHTML = tags;
-  }
-  function renderRestaurantArea() {
-    document.getElementById('contentArea').innerHTML = `
-      <h2>Post a Donation</h2>
-      <form id="donationForm">
-        <div class="form-group">
-          <label for="foodType">Food Type</label>
-          <input type="text" id="foodType" placeholder="E.g. Pizza, Bread, Vegetables..." required>
-        </div>
-        <div class="form-group">
-          <label for="quantity">Quantity / Estimate</label>
-          <input type="text" id="quantity" placeholder="E.g. 50 lbs, 20 servings, 3 boxes" required>
-        </div>
-        <div class="form-group">
-          <label for="pickupDate">Best By / Pickup Date</label>
-          <input type="date" id="pickupDate" required>
-        </div>
-        <button type="submit" class="btn btn-green">Post Donation</button>
-        <div class="message" id="donationMsg"></div>
+      <!-- FRONT: Register -->
+      <div class="card front" id="registerCard">
+        <div class="logo-text"><span class="logo-icon">🍽️</span> Food Connect</div>
+        <h2>Create account</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="regUsername">Username</label>
+            <input id="regUsername" autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Password</label>
+            <input id="regPassword" type="password" autocomplete="new-password" />
+          </div>
+          <button class="btn btn-green" type="submit">Register</button>
+          <div class="message" id="registerMsg"></div>
+        </form>
+        <div class="link" id="toLogin">Already have an account? Login ↻</div>
+      </div>
+
+      <!-- BACK: Login -->
+      <div class="card back" id="loginCard">
+        <div class="logo-text"><span class="logo-icon">🍽️</span> Food Connect</div>
+        <h2>Login</h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginUsername">Username</label>
+            <input id="loginUsername" autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" autocomplete="current-password" />
+          </div>
+          <button class="btn btn-blue" type="submit">Login</button>
+          <div class="message" id="loginMsg"></div>
+        </form>
+        <div class="link" id="toRegister">New here? Register ↺</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Role selection (shown after login) -->
+  <div class="role-container" id="roleView">
+    <div class="logo-text"><span class="logo-icon">🍽️</span> Food Connect</div>
+    <h2>Select your role</h2>
+    <button class="btn btn-green" id="asRestaurant">I am a Restaurant (Donor)</button>
+    <button class="btn btn-blue" id="asShelter">I am a Shelter (Receiver)</button>
+    <div style="margin-top:8px;color:#555;">(Your role controls available actions.)</div>
+  </div>
+
+  <!-- Main app -->
+  <div class="app-main" id="mainApp">
+    <div class="top-row">
+      <div>
+        <div style="font-weight:800;">User: <span id="userDisplay"></span></div>
+        <div style="font-size:13px;color:#555;">ID: <span id="userIdDisplay"></span></div>
+      </div>
+      <div style="text-align:right;">
+        <div id="roleTag" class="role-tag"></div>
+        <div class="change-role" id="changeRoleBtn">Change Role</div>
+      </div>
+    </div>
+
+    <div id="restaurantArea" style="display:none;">
+      <h3>Post a Donation</h3>
+      <form id="donForm">
+        <div class="form-group"><label>Food Type</label><input id="foodType" required /></div>
+        <div class="form-group"><label>Quantity / Estimate</label><input id="foodQty" required /></div>
+        <div class="form-group"><label>Pickup Date</label><input id="pickupDate" type="date" required /></div>
+        <button class="btn btn-green" type="submit">Post Donation</button>
       </form>
-      <div class="posted-donations">
-        <h2 style="color:#179c50;">My Posted Donations</h2>
-        <div id="postedList"></div>
-      </div>
-    `;
-    document.getElementById('donationForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const foodType = document.getElementById('foodType').value.trim();
-      const quantity = document.getElementById('quantity').value.trim();
-      const pickupDate = document.getElementById('pickupDate').value;
-      if (foodType && quantity && pickupDate) {
-        postedDonations.push({foodType, quantity, pickupDate, donorId: userId});
-        document.getElementById('donationMsg').style.color = "green";
-        document.getElementById('donationMsg').textContent = "Donation posted successfully!";
-        renderPostedList();
-        document.getElementById('donationForm').reset();
-      } else {
-        document.getElementById('donationMsg').style.color = "red";
-        document.getElementById('donationMsg').textContent = "All fields are required.";
-      }
-    });
-    renderPostedList();
+      <h3 style="margin-top:14px;">My Posted Donations</h3>
+      <div class="posted-list" id="postedList"></div>
+    </div>
+
+    <div id="shelterArea" style="display:none;">
+      <h3>Available Donations</h3>
+      <div class="posted-list" id="availableList"></div>
+    </div>
+  </div>
+
+<script>
+/* -------------------------
+   persistence helpers
+   ------------------------- */
+function loadUsers(){
+  try{
+    const raw = localStorage.getItem('fc_users');
+    return raw ? JSON.parse(raw) : {};
+  }catch(e){ return {}; }
+}
+function saveUsers(obj){
+  localStorage.setItem('fc_users', JSON.stringify(obj));
+}
+function loadDonations(){
+  try{ const raw = localStorage.getItem('fc_donations'); return raw? JSON.parse(raw): []; }catch(e){return [];}
+}
+function saveDonations(arr){ localStorage.setItem('fc_donations', JSON.stringify(arr)); }
+
+/* -------------------------
+   initial visuals (emoji bg)
+   ------------------------- */
+const emojis = ["🍕","🍔","🥗","🍩","🍎","🥪","🍰","🍉"];
+const bg = document.getElementById('emoji-bg');
+for(let i=0;i<20;i++){
+  const s=document.createElement('span');
+  s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  s.style.top = (Math.random()*100)+'%';
+  s.style.left = (Math.random()*100)+'%';
+  s.style.animationDelay = (Math.random()*6)+'s';
+  bg.appendChild(s);
+}
+
+/* cursor floating foods */
+document.addEventListener('mousemove', e=>{
+  const f = document.createElement('div');
+  f.className = 'food';
+  f.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  f.style.left = (e.pageX - 12) + 'px';
+  f.style.top = (e.pageY - 12) + 'px';
+  document.body.appendChild(f);
+  setTimeout(()=> f.remove(), 1800);
+});
+
+/* subtle tilt of flip container */
+const flipContainer = document.getElementById('flipContainer');
+document.addEventListener('mousemove', e=>{
+  const x = (window.innerWidth/2 - e.pageX) / 30;
+  const y = (window.innerHeight/2 - e.pageY) / 30;
+  flipContainer.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
+  document.body.style.backgroundPosition = `${e.pageX/120}px ${e.pageY/120}px`;
+});
+
+/* -------------------------
+   app state
+   ------------------------- */
+let users = loadUsers();    // object: username -> { password, id? }
+let donations = loadDonations(); // array of {food, qty, pickupDate, donor, donorId}
+let currentUser = null;
+let currentUserId = null;
+let currentRole = null;
+
+/* -------------------------
+   DOM refs & flip
+   ------------------------- */
+const flipper = document.getElementById('flipper');
+const toLogin = document.getElementById('toLogin');
+const toRegister = document.getElementById('toRegister');
+const registerForm = document.getElementById('registerForm');
+const loginForm = document.getElementById('loginForm');
+const registerMsg = document.getElementById('registerMsg');
+const loginMsg = document.getElementById('loginMsg');
+
+function flipToLogin(){ flipper.classList.add('flipped'); registerMsg.textContent=''; }
+function flipToRegister(){ flipper.classList.remove('flipped'); loginMsg.textContent=''; }
+toLogin.addEventListener('click', flipToLogin);
+toRegister.addEventListener('click', flipToRegister);
+
+/* -------------------------
+   register & login behavior
+   ------------------------- */
+registerForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const u = document.getElementById('regUsername').value.trim();
+  const p = document.getElementById('regPassword').value.trim();
+  if(!u||!p){ registerMsg.style.color='crimson'; registerMsg.textContent='All fields required'; return; }
+  if(users[u]){ registerMsg.style.color='crimson'; registerMsg.textContent='Username already exists'; return; }
+  // create and persist user
+  const id = 'u_' + Date.now() + '_' + Math.floor(Math.random()*9000);
+  users[u] = { password: p, id };
+  saveUsers(users);
+  registerMsg.style.color='green'; registerMsg.textContent='Registered ✓ — flipping to login...';
+  setTimeout(()=>{ flipToLogin(); document.getElementById('loginUsername').value = u; }, 700);
+});
+
+loginForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value.trim();
+  if(!u||!p){ loginMsg.style.color='crimson'; loginMsg.textContent='Fill both fields'; return; }
+  const user = users[u];
+  if(!user || user.password !== p){
+    loginMsg.style.color='crimson'; loginMsg.textContent='Invalid credentials';
+    return;
   }
-  function renderPostedList() {
-    const listDiv = document.getElementById('postedList');
-    if (!postedDonations.length) {
-      listDiv.innerHTML = "<div>No donations posted yet.</div>";
-      return;
-    }
-    let html = "";
-    postedDonations.forEach((donation, i) => {
-      html += `
+  // success: set current user & show role view
+  currentUser = u;
+  currentUserId = user.id || ('u_'+Date.now());
+  users[u].id = currentUserId; saveUsers(users);
+  loginMsg.style.color='green'; loginMsg.textContent = 'Welcome, ' + u + ' ✓';
+  // hide flip card and show role selection
+  document.getElementById('flipper').style.display = 'none';
+  document.getElementById('flipContainer').style.display = 'none';
+  document.getElementById('roleView').style.display = 'block';
+});
+
+/* -------------------------
+   role selection + main UI
+   ------------------------- */
+document.getElementById('asRestaurant').addEventListener('click', ()=> openAppAs('restaurant'));
+document.getElementById('asShelter').addEventListener('click', ()=> openAppAs('shelter'));
+document.getElementById('changeRoleBtn').addEventListener('click', ()=> {
+  // return to role selection
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('roleView').style.display = 'block';
+  currentRole = null;
+});
+
+function openAppAs(role){
+  currentRole = role;
+  // hide role selection, show main
+  document.getElementById('roleView').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  // populate header
+  document.getElementById('userDisplay').textContent = currentUser;
+  document.getElementById('userIdDisplay').textContent = currentUserId;
+  const tag = document.getElementById('roleTag');
+  tag.textContent = role === 'restaurant' ? 'Restaurant' : 'Shelter';
+  tag.className = 'role-tag ' + (role==='restaurant' ? 'restaurant-role':'shelter-role');
+  // show appropriate area
+  document.getElementById('restaurantArea').style.display = role==='restaurant' ? 'block':'none';
+  document.getElementById('shelterArea').style.display = role==='shelter' ? 'block':'none';
+  renderDonations();
+}
+
+/* -------------------------
+   donations handling
+   ------------------------- */
+const donForm = document.getElementById('donForm');
+if(donForm){
+  donForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const food = document.getElementById('foodType').value.trim();
+    const qty = document.getElementById('foodQty').value.trim();
+    const pickupDate = document.getElementById('pickupDate').value;
+    if(!food||!qty||!pickupDate) return alert('All fields required');
+    const entry = { food, qty, pickupDate, donor: currentUser, donorId: currentUserId, created: Date.now() };
+    donations.unshift(entry);
+    saveDonations(donations);
+    renderDonations();
+    donForm.reset();
+    alert('Donation posted ✓');
+  });
+}
+
+function renderDonations(){
+  donations = loadDonations();
+  // postedList shows donations posted by current user
+  const postedList = document.getElementById('postedList');
+  if(postedList){
+    const mine = donations.filter(d=>d.donor === currentUser);
+    postedList.innerHTML = mine.length ? mine.map(d=> `
       <div class="donation-entry">
-        <b>${donation.foodType}</b> <br>
-        Quantity: ${donation.quantity} <br>
-        Pickup Date: ${donation.pickupDate} <br>
-        ID: ${donation.donorId}
-      </div>`;
-    });
-    listDiv.innerHTML = html;
+        <b>${escapeHtml(d.food)}</b> — ${escapeHtml(d.qty)} <br>
+        Pickup: ${d.pickupDate} <br>
+        ID: ${d.donorId}
+        <div style="margin-top:6px;">
+          <button class="btn btn-blue" onclick="removeDonation('${d.created}')">Remove</button>
+        </div>
+      </div>
+    `).join('') : '<div>No donations posted yet.</div>';
   }
-  function renderShelterArea() {
-    document.getElementById('contentArea').innerHTML = `
-      <h2>Welcome, Shelter</h2>
-      <div style="margin-bottom:18px;">
-        Browse the posted donations and click "Claim Donation" when you can pick up food.
-      </div>
-      <div class="info-box">
-        <b>Claiming Rules:</b>
-        <ul>
-          <li>Only one shelter can claim a donation at a time.</li>
-          <li>Contact the donor (via their ID) after claiming for pickup arrangements.</li>
-          <li>Donations not claimed are <b>Available</b>.</li>
-        </ul>
-      </div>
-      <div class="posted-donations">
-        <h2 style="color:#2677c3;">Available Donations</h2>
-        <div id="availableList"></div>
-      </div>
-    `;
-    renderAvailableList();
-  }
-  function renderAvailableList() {
-    const listDiv = document.getElementById('availableList');
-    if (!postedDonations.length) {
-      listDiv.innerHTML = "<div>No donations available yet.</div>";
-      return;
-    }
-    let html = "";
-    postedDonations.forEach((donation, idx) => {
-      html += `
+  // availableList shows all donations
+  const availableList = document.getElementById('availableList');
+  if(availableList){
+    availableList.innerHTML = donations.length ? donations.map((d, idx)=> `
       <div class="donation-entry">
-        <b>${donation.foodType}</b> <br>
-        Quantity: ${donation.quantity} <br>
-        Pickup Date: ${donation.pickupDate} <br>
-        Donor ID: ${donation.donorId} <br>
-        <button class="btn btn-blue" onclick="claimDonation(${idx})">Claim Donation</button>
-      </div>`;
-    });
-    listDiv.innerHTML = html;
+        <b>${escapeHtml(d.food)}</b> — ${escapeHtml(d.qty)} <br>
+        Pickup: ${d.pickupDate} <br>
+        Donor: ${escapeHtml(d.donor)} (ID: ${d.donorId}) 
+        ${ currentRole === 'shelter' ? `<div style="margin-top:8px;"><button class="btn btn-green" onclick="claimDonation(${idx})">Claim Donation</button></div>` : '' }
+      </div>
+    `).join('') : '<div>No donations available.</div>';
   }
-  function claimDonation(idx) {
-    alert("Donation claimed! Contact Donor ID: " + postedDonations[idx].donorId);
-    postedDonations.splice(idx,1);
-    renderAvailableList();
-  }
-  function renderMainArea() {
-    if (userRole === "restaurant") renderRestaurantArea();
-    if (userRole === "shelter") renderShelterArea();
-  }
+}
+
+window.removeDonation = function(created){
+  // remove donation by created timestamp (string/number)
+  donations = donations.filter(d => String(d.created) !== String(created));
+  saveDonations(donations);
+  renderDonations();
+}
+
+window.claimDonation = function(index){
+  const d = donations[index];
+  if(!d) return alert('Donation not found');
+  if(!confirm(`Claim "${d.food}" from ${d.donor}?`)) return;
+  // simple claim: remove and notify
+  donations.splice(index,1);
+  saveDonations(donations);
+  renderDonations();
+  alert('Claimed! Contact donor ID: ' + d.donorId);
+}
+
+/* small helper to avoid XSS when injecting content */
+function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+
+/* preload: if users or donations keys missing, ensure keys exist */
+saveUsers(users); saveDonations(donations);
+
+/* if user accidentally refreshes and wants to restart auth, show flip again (no auto-login) */
+/* You can add auto-login by storing current user into localStorage and restoring here. */
 </script>
 </body>
 </html>
